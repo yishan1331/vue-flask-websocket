@@ -6,6 +6,7 @@ from flask_socketio import SocketIO,send,emit,join_room, leave_room,close_room,r
 import sys
 import thread
 from threading import Lock
+import time
 # # from urllib import unquote
 
 app = Flask(__name__)  
@@ -24,6 +25,7 @@ thread_lock = Lock()
 #     send(message,broadcast=True)  
 
 keep = False
+inputstatus = False
 logfileList = ["test","test2"]
 
 class Get_Immediate_Logging_File():
@@ -137,10 +139,20 @@ def monitorFile(filename):
     socketio.on_event(filename, get_file)
     return "ok"
 
-@app.route('/startinput', methods=['GET'])
+@app.route('/inputfile/<status>', methods=['GET'])
+def inputfile(status):
+    global inputstatus
+    if status == "true":
+        inputstatus = True
+    else:
+        inputstatus = False
+    thread.start_new_thread(writefile,())
+    return "ok"
+
 def writefile():
+    global inputstatus
     counter = 0 
-    while True:
+    while inputstatus:
         writefile = open("file/test.txt", 'a')
         writefile.write('test' + str(counter) + '\n')
         writefile.close()
@@ -150,6 +162,12 @@ def writefile():
         counter += 1
         # print  counter
         time.sleep(2)
+
+@app.route('/cleanfile', methods=['GET'])
+def clearfile():
+    open('file/test.txt', 'w').close()
+    open('file/test2.txt', 'w').close()
+    return "ok"
 
 def get_file(filename):
     join_room(filename)
@@ -183,7 +201,7 @@ def keep():
     keep = True
 
 def timer():
-    import time
+    # import time
     from datetime import datetime
     from time import strftime 
     print "-------------------------------------------"

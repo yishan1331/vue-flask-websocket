@@ -1,7 +1,10 @@
 <template>
     <div class="about">
         <h1>This is an about page</h1>
-        <button type="button" class="btn btn-primary" @click="socket_connect">連接socket</button>
+        <button type="button" class="mr-3 btn btn-primary" @click="socket_connect">連接socket</button>
+        <button type="button" class="mr-3 btn btn-success" @click="inputfile(true)">測試資料開始</button>
+        <button type="button" class="mr-3 btn btn-warning" @click="inputfile(false)">測試資料結束</button>
+        <button type="button" class="mr-3 btn btn-danger" @click="cleanfile">清除測試資料</button>
         <div style="text-align:center;margin:15px">
             <b-form-select v-model="selected" :options="options" style="width:310px" size="lg">
                 <template v-slot:first>
@@ -10,10 +13,7 @@
             </b-form-select>
         </div>
         <button type="button" class="btn btn-info" @click.prevent="monitor">送出</button>
-        <!-- <button @click="socket_subscribe_test">查看test.txt</button>
-        <button @click="socket_subscribe_test2">查看test2.txt</button>-->
-        {{set_latest_number}} | {{sid}}
-        <!-- <div id="loggingStreamView" style="height:600px;border:1px solid #000;overflow-y:scroll"> -->
+        <!-- {{set_latest_number}} | {{sid}} -->
         <div id="loggingStreamView">
             <div v-for="(item,key) in log_list" :key="key">{{item}}</div>
         </div>
@@ -132,6 +132,38 @@ export default {
                         console.log(vm.sockets.listener);
                         console.log(vm.sockets);
                     }
+                })
+                .catch(function (error) {
+                    // 请求失败处理
+                    console.log(error);
+                });
+        },
+        inputfile(status) {
+            let vm = this;
+            axios
+                .get("http://localhost:5000/inputfile/" + status, {
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                    },
+                })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    // 请求失败处理
+                    console.log(error);
+                });
+        },
+        cleanfile() {
+            let vm = this;
+            axios
+                .get("http://localhost:5000/cleanfile", {
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                    },
+                })
+                .then(function (response) {
+                    console.log(response);
                 })
                 .catch(function (error) {
                     // 请求失败处理
