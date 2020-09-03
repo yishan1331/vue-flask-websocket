@@ -14,7 +14,8 @@ Vue.use(new VueSocketIO({
     //研发环境会打印socket初始化过程+socket中定义的事件
     debug: false,
     //我们的鉴权是拼接在query的 这个根据自己项目的实际情况来
-    connection: 'http://localhost:5000',
+    connection: '/',
+    // connection: 'http://localhost:5000',
     options: {
         autoConnect: false//自动连接
         //https://github.com/MetinSeylan/Vue-Socket.io/issues/137

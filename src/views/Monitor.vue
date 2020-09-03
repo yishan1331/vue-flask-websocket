@@ -1,6 +1,6 @@
 <template>
-    <div class="about">
-        <h1>This is an about page</h1>
+    <div class="Monitor">
+        <h1>This is an Monitor page</h1>
         <button type="button" class="mr-3 btn btn-primary" @click="socket_connect">連接socket</button>
         <button type="button" class="mr-3 btn btn-success" @click="inputfile(true)">測試資料開始</button>
         <button type="button" class="mr-3 btn btn-warning" @click="inputfile(false)">測試資料結束</button>
@@ -22,7 +22,7 @@
 <script>
 import axios from "axios";
 export default {
-    name: "about",
+    name: "Monitor",
     data() {
         return {
             log_list: [],
@@ -75,7 +75,8 @@ export default {
         getLogFile() {
             let vm = this;
             axios
-                .get("http://localhost:5000/getLoggingFile", {
+                // .get("http://localhost:5000/getLoggingFile", {
+                .get("getLoggingFile", {
                     headers: {
                         "Access-Control-Allow-Origin": "*",
                     },
@@ -97,7 +98,8 @@ export default {
             vm.set_latest_number = 0;
 
             axios
-                .get("http://localhost:5000/monitorFile/" + vm.selected, {
+                // .get("http://localhost:5000/monitorFile/" + vm.selected, {
+                .get("monitorFile/" + vm.selected, {
                     headers: {
                         "Access-Control-Allow-Origin": "*",
                     },
@@ -141,7 +143,8 @@ export default {
         inputfile(status) {
             let vm = this;
             axios
-                .get("http://localhost:5000/inputfile/" + status, {
+                // .get("http://localhost:5000/inputfile/" + status, {
+                .get("inputfile/" + status, {
                     headers: {
                         "Access-Control-Allow-Origin": "*",
                     },
@@ -157,7 +160,8 @@ export default {
         cleanfile() {
             let vm = this;
             axios
-                .get("http://localhost:5000/cleanfile", {
+                // .get("http://localhost:5000/cleanfile", {
+                .get("cleanfile", {
                     headers: {
                         "Access-Control-Allow-Origin": "*",
                     },

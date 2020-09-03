@@ -1,28 +1,24 @@
 #coding=utf-8  
 from flask import Flask  
-from flask import request,jsonify  
+from flask import request,jsonify,send_file,render_template
 from flask_cors import CORS  
 from flask_socketio import SocketIO,send,emit,join_room, leave_room,close_room,rooms,disconnect
 import sys
 import thread
 from threading import Lock
 import time
+import os
 # # from urllib import unquote
 
-app = Flask(__name__)  
+FRONTEND_FOLDER = os.path.join(os.getcwd(),'dist')
+
+app = Flask(__name__,template_folder=FRONTEND_FOLDER,static_folder=os.path.join(FRONTEND_FOLDER,'static'))  
 
 CORS(app,cors_allowed_origins="*")  
 
 socketio = SocketIO(app,cors_allowed_origins='*')  
 
 thread_lock = Lock()
-
-# @socketio.on('message')  
-# def handle_message(message):  
-#     print(message)  
-#     # print(unquote(message))  
-#     # message = unquote(message)
-#     send(message,broadcast=True)  
 
 keep = False
 inputstatus = False
@@ -34,27 +30,16 @@ class Get_Immediate_Logging_File():
         self.filename = ""
     
     def work(self):
-        print "~~~~self.switch~~~~"
-        print self.switch
-        print "~~~~filename~~~~"
-        print self.filename
         if self.filename == "" or self.filename is None:
-            print "**************"
             self.switch = False
         else:
             this_socketio_name = "watch_"+self.filename.split(".")[0]
-            print "~~~~this_socketio_name~~~~"
-            print this_socketio_name
             monitorLogging = globals()
-            print "~~~~already_print_num~~~~"
-            print monitorLogging["already_print_num"+self.filename]
-            print "------start while------"
 
         while self.switch:
             socketio.sleep(1)
-            with open(self.filename+".txt", "r") as readfile:
+            with open("file/"+self.filename+".txt", "r") as readfile:
                 lines = readfile.readlines()
-                print len(lines)
 
                 if monitorLogging["already_print_num"+self.filename] < len(lines):
                     print_lines = lines[monitorLogging["already_print_num"+self.filename] - len(lines):]
@@ -63,23 +48,18 @@ class Get_Immediate_Logging_File():
                             returnnum = monitorLogging["already_print_num"+self.filename]
                         else:
                             returnnum = i
-                        # print returnnum
                         socketio.emit(this_socketio_name,
                                     {'data': print_lines[i].replace('\n',''),"already_print_num":returnnum},
                                     broadcast=True)
-                        print len(lines), monitorLogging["already_print_num"+self.filename], print_lines[i].replace('\n','')
                     monitorLogging["already_print_num"+self.filename] = len(lines)
     
     def start(self,filename):
-        print "####start#####"
         self.switch = True
         self.filename = filename
         self.work()
-        print "-----#work end#-----"
 
     def stop(self):
         self.switch = False
-        print "-----stop-----"
     
     def check_status(self):
         return self.switch
@@ -87,8 +67,6 @@ class Get_Immediate_Logging_File():
 #socket连接，主动连接
 @socketio.on('connect')
 def connect():
-    print "is connected"
-    print('Client connected',request.sid)
     monitorLogging = globals()
     monitorLogging[request.sid] = None
     if not monitorLogging.get("filethreadlist"):
@@ -109,16 +87,16 @@ def connect():
 
 @socketio.on('disconnect')  
 def disconnect():  
-    print('Client disconnected',request.sid)
     global keep
     keep = False
 
     monitorLogging = globals()
     #檢查欲disconnect的request.sid目前在哪個房間，並將其從房間人數列表中移出
-    monitorLogging["eachroom_peoplenum"][monitorLogging[request.sid]].remove(request.sid)
-    #若房間人數列表再移除完此request.sid後長度為0，表示此房間目前無任何人，可以停止class read log file
-    if len(monitorLogging["eachroom_peoplenum"][monitorLogging[request.sid]]) == 0:
-        monitorLogging["loggingclass"]["thread_"+monitorLogging[request.sid]].stop()
+    if monitorLogging[request.sid] is not None:
+        monitorLogging["eachroom_peoplenum"][monitorLogging[request.sid]].remove(request.sid)
+        #若房間人數列表再移除完此request.sid後長度為0，表示此房間目前無任何人，可以停止class read log file
+        if len(monitorLogging["eachroom_peoplenum"][monitorLogging[request.sid]]) == 0:
+            monitorLogging["loggingclass"]["thread_"+monitorLogging[request.sid]].stop()
     #再刪除global變數request.sid
     del monitorLogging[request.sid]
 
@@ -127,7 +105,8 @@ def disconnect():
 
 @app.route('/', methods=['GET'])
 def index():
-    return 'welcome to the chatroom!'
+    return render_template('index.html')
+    # return send_file(entry)
 
 @app.route('/getLoggingFile', methods=['GET'])
 def getLoggingFile():
@@ -143,11 +122,15 @@ def monitorFile(filename):
 def inputfile(status):
     global inputstatus
     if status == "true":
-        inputstatus = True
+        if not inputstatus:
+            inputstatus = True
+            thread.start_new_thread(writefile,())
+            return "ok"
+        else:
+            return "already start input"
     else:
         inputstatus = False
-    thread.start_new_thread(writefile,())
-    return "ok"
+        return "ok"
 
 def writefile():
     global inputstatus
@@ -160,7 +143,6 @@ def writefile():
         writefile2.write('zzz' + str(counter) + '\n')
         writefile2.close()
         counter += 1
-        # print  counter
         time.sleep(2)
 
 @app.route('/cleanfile', methods=['GET'])
@@ -214,10 +196,13 @@ def timer():
         monitorLogging = globals()
         for key,value in monitorLogging["filethreadlist"].items():
             monitorLogging["loggingclass"][key].stop()
+        global inputstatus
+        inputstatus = False
+        clearfile()
     
 if __name__ == '__main__':
     # app = create_app()
     # app.run(host='0.0.0.0', debug=True, port=5002)
-    socketio.run(app, debug=True, port=5000, host='0.0.0.0')
+    socketio.run(app, debug=True, port=5000)
 
 #參考 https://blog.csdn.net/qq_43076825/article/details/91489558?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.channel_param&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.channel_param
