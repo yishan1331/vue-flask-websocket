@@ -87,7 +87,7 @@ def connect():
     emit("re_connect", {"msg": "connected","sid":request.sid})
 
 @socketio.on('disconnect')  
-def disconnect():  
+def disconnect():
     global keep
     keep = False
 
