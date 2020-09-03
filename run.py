@@ -186,12 +186,12 @@ def timer():
     # import time
     from datetime import datetime
     from time import strftime 
-    print "-------------------------------------------"
-    print datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print("-------------------------------------------")
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     time.sleep(10) #60秒後檢查是否還有socket connect
-    print datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print "-------------------------------------------"
-    print keep
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print("-------------------------------------------")
+    print(keep)
     if not keep:
         monitorLogging = globals()
         for key,value in monitorLogging["filethreadlist"].items():
