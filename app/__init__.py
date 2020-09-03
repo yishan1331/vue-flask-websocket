@@ -12,7 +12,6 @@ import os
 # # from urllib import unquote
 
 FRONTEND_FOLDER = os.path.join(os.getcwd(),'dist')
-print(FRONTEND_FOLDER)
 
 app = Flask(__name__,template_folder=FRONTEND_FOLDER,static_folder=os.path.join(FRONTEND_FOLDER,'static'))  
 
@@ -107,7 +106,8 @@ def disconnect():
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return "HI"
+    # return render_template('index.html')
     # return send_file(entry)
 
 @app.route('/getLoggingFile', methods=['GET'])
