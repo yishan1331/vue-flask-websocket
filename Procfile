@@ -1,1 +1,1 @@
-web: gunicorn -k gevent run:app --log-file -
+web: gunicorn run:app --log-file debug -
