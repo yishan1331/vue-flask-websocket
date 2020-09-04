@@ -10,7 +10,7 @@ logfileList = ["test","test2"]
 def create_app(debug=False):
     """Create an application."""
     FRONTEND_FOLDER = os.path.join(os.getcwd(),'dist')
-    print FRONTEND_FOLDER
+    print(FRONTEND_FOLDER)
 
     app = Flask(__name__,template_folder=FRONTEND_FOLDER,static_folder=os.path.join(FRONTEND_FOLDER,'static'))
     CORS(app,cors_allowed_origins="*")  
