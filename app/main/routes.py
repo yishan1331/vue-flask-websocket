@@ -1,7 +1,7 @@
 # coding=utf-8 
 from flask import request,jsonify,send_file,render_template
 from . import main
-from events import get_file,inputstatus
+from .events import get_file,inputstatus
 # from .forms import LoginForm
 from .. import socketio
 from .. import logfileList
