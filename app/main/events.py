@@ -122,7 +122,7 @@ def keep():
     keep = True
 
 def timer():
-    # import time
+    import time
     from datetime import datetime
     from time import strftime 
     print("-------------------------------------------")
