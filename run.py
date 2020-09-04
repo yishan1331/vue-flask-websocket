@@ -5,3 +5,6 @@ app = create_app(debug=True)
 
 if __name__ == '__main__':
     socketio.run(app)
+
+
+#https://github.com/miguelgrinberg/Flask-SocketIO/issues/176

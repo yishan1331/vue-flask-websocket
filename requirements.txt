@@ -1,5 +1,6 @@
 gunicorn==18.0
-gevent 
+gevent
+eventlet
 click==7.1.2
 dnspython==1.16.0
 eventlet==0.26.1
