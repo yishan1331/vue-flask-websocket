@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO,send,emit,join_room, leave_room,close_room,rooms,disconnect
 import sys
 # import thread #python2
-import _thread #兼容性，Python3 将 thread 重命名为 "thread"
+import thread #兼容性，Python3 将 thread 重命名为 "thread"
 from threading import Lock
 import time
 import os
@@ -102,7 +102,7 @@ def disconnect():
     del monitorLogging[request.sid]
 
     #最後防線-檢查是否還有人
-    _thread.start_new_thread(timer,())
+    thread.start_new_thread(timer,())
 
 @app.route('/', methods=['GET'])
 def index():
@@ -126,7 +126,7 @@ def inputfile(status):
     if status == "true":
         if not inputstatus:
             inputstatus = True
-            _thread.start_new_thread(writefile,())
+            thread.start_new_thread(writefile,())
             return "ok"
         else:
             return "already start input"
