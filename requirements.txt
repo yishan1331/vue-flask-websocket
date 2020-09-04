@@ -1,4 +1,4 @@
-gunicorn==19.7.1
+gunicorn==18.0
 gevent 
 click==7.1.2
 dnspython==1.16.0
