@@ -3,7 +3,7 @@ from flask import request
 from flask_socketio import send,emit,join_room, leave_room,close_room,rooms,disconnect
 from .. import socketio,logfileList
 # from .routes import clearfile
-import _thread
+import thread
 from threading import Lock
 
 thread_lock = Lock()
@@ -88,9 +88,11 @@ def disconnect():
     del monitorLogging[request.sid]
 
     #最後防線-檢查是否還有人
-    _thread.start_new_thread(timer,())
+    thread.start_new_thread(timer,())
 
 def get_file(filename):
+    print "~~~get_file~~~~"
+    print filename
     join_room(filename)
 
     monitorLogging = globals()

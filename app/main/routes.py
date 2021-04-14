@@ -7,7 +7,7 @@ from .. import socketio
 from .. import logfileList
 
 import time
-import _thread
+import thread
 
 
 @main.route('/', methods=['GET'])
@@ -21,6 +21,8 @@ def getLoggingFile():
 @main.route('/monitorFile/<filename>', methods=['GET'])
 def monitorFile(filename):
     #註冊socketio event
+    print "~~~monitorFile~~~~"
+    print filename
     socketio.on_event(filename, get_file)
     return "ok"
 
@@ -30,7 +32,7 @@ def inputfile(status):
     if status == "true":
         if not inputstatus:
             inputstatus = True
-            _thread.start_new_thread(writefile,())
+            thread.start_new_thread(writefile,())
             return "ok"
         else:
             return "already start input"
